@@ -1,6 +1,6 @@
 # playTime
 
-shows how long you've played each game, right under registered games in settings
+shows how long you've played each game
 
 ![play time under registered games](screenshots/settings.png)
 
