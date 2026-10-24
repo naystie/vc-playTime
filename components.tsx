@@ -9,7 +9,7 @@ import { Button } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { classNameFactory } from "@utils/css";
 import { findByCodeLazy, findByPropsLazy, findExportedComponentLazy, findStoreLazy } from "@webpack";
-import { ApplicationStore, moment, Select, TextInput, useEffect, useMemo, useState, useStateFromStores } from "@webpack/common";
+import { ApplicationStore, lodash, moment, Select, TextInput, useEffect, useMemo, useState, useStateFromStores } from "@webpack/common";
 
 interface Statistic {
     application_id: string;
@@ -44,6 +44,7 @@ const GameControllerIcon = findExportedComponentLazy("GameControllerIcon");
 
 const PREVIEW_COUNT = 20;
 const RECENT_DAYS = 30;
+const FETCH_CHUNK_SIZE = 100;
 
 const hourFormat = new Intl.NumberFormat("en", { style: "unit", unit: "hour", unitDisplay: "long", maximumFractionDigits: 0 });
 const minuteFormat = new Intl.NumberFormat("en", { style: "unit", unit: "minute", unitDisplay: "long", maximumFractionDigits: 0 });
@@ -71,14 +72,20 @@ function getGameApplication(id: string) {
     return (canonicalId && ApplicationStore.getApplication(canonicalId) as GameApplication | undefined) || app;
 }
 
+async function fetchApplications(ids: string[]) {
+    for (const chunk of lodash.chunk(ids, FETCH_CHUNK_SIZE)) {
+        await ApplicationActions.fetchApplications(chunk, false);
+    }
+}
+
 async function loadGames() {
     await fetchStatistics();
 
     const ids = Object.keys(StatisticsStore.applicationStatistics);
-    await ApplicationActions.fetchApplications(ids, false);
+    await fetchApplications(ids);
 
-    const canonicalIds = ids.map(id => getGameApplication(id)?.getCanonicalGameId()).filter(Boolean);
-    await ApplicationActions.fetchApplications(canonicalIds, false);
+    const canonicalIds = ids.map(id => getGameApplication(id)?.getCanonicalGameId()).filter(id => id != null);
+    await fetchApplications(canonicalIds);
 }
 
 function useGames() {
