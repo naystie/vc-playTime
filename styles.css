@@ -1,0 +1,114 @@
+.vc-playtime-root {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+.vc-playtime-strong {
+    color: var(--text-strong);
+}
+
+.vc-playtime-subtle {
+    color: var(--text-subtle);
+}
+
+.vc-playtime-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-8);
+}
+
+.vc-playtime-stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-12) var(--space-16);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: var(--background-mod-subtle);
+}
+
+.vc-playtime-toolbar {
+    display: flex;
+    gap: var(--space-8);
+}
+
+.vc-playtime-search {
+    flex: 1;
+}
+
+.vc-playtime-sort {
+    width: 200px;
+}
+
+.vc-playtime-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.vc-playtime-game {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    padding: var(--space-8) 0;
+}
+
+.vc-playtime-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background: var(--background-mod-normal);
+    color: var(--icon-muted);
+    object-fit: cover;
+}
+
+.vc-playtime-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.vc-playtime-name {
+    overflow: hidden;
+    color: var(--text-strong);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.vc-playtime-time {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-6);
+    width: 128px;
+}
+
+.vc-playtime-bar {
+    width: 100%;
+    height: 4px;
+    overflow: hidden;
+    border-radius: var(--radius-round);
+    background: var(--background-mod-normal);
+}
+
+.vc-playtime-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--brand-500);
+}
+
+.vc-playtime-empty {
+    padding: var(--space-8) 0;
+}
+
+.vc-playtime-more {
+    align-self: center;
+}
