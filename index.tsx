@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import { waitFor } from "@webpack";
 
@@ -19,7 +20,8 @@ waitFor(["SIDEBAR_ITEM", "CATEGORY", "CUSTOM"], m => LayoutTypes = m);
 export default definePlugin({
     name: "PlayTime",
     description: "Shows how long you've played each game",
-    authors: [{ name: "Nays", id: 344871509677965313n }],
+    authors: [Devs.Nays],
+    tags: ["Activity"],
     managedStyle,
 
     patches: [

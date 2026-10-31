@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
+import { Text } from "@components/Text";
 import { classNameFactory } from "@utils/css";
 import { findByCodeLazy, findByPropsLazy, findExportedComponentLazy, findStoreLazy } from "@webpack";
-import { ApplicationStore, moment, Select, TextInput, useEffect, useMemo, useState, useStateFromStores } from "@webpack/common";
+import { ApplicationStore, lodash, moment, Select, TextInput, useEffect, useMemo, useState, useStateFromStores } from "@webpack/common";
 
 interface Statistic {
     application_id: string;
@@ -44,6 +44,7 @@ const GameControllerIcon = findExportedComponentLazy("GameControllerIcon");
 
 const PREVIEW_COUNT = 20;
 const RECENT_DAYS = 30;
+const FETCH_CHUNK_SIZE = 100;
 
 const hourFormat = new Intl.NumberFormat("en", { style: "unit", unit: "hour", unitDisplay: "long", maximumFractionDigits: 0 });
 const minuteFormat = new Intl.NumberFormat("en", { style: "unit", unit: "minute", unitDisplay: "long", maximumFractionDigits: 0 });
@@ -71,14 +72,20 @@ function getGameApplication(id: string) {
     return (canonicalId && ApplicationStore.getApplication(canonicalId) as GameApplication | undefined) || app;
 }
 
+async function fetchApplications(ids: string[]) {
+    for (const chunk of lodash.chunk(ids, FETCH_CHUNK_SIZE)) {
+        await ApplicationActions.fetchApplications(chunk, false);
+    }
+}
+
 async function loadGames() {
     await fetchStatistics();
 
     const ids = Object.keys(StatisticsStore.applicationStatistics);
-    await ApplicationActions.fetchApplications(ids, false);
+    await fetchApplications(ids);
 
-    const canonicalIds = ids.map(id => getGameApplication(id)?.getCanonicalGameId()).filter(Boolean);
-    await ApplicationActions.fetchApplications(canonicalIds, false);
+    const canonicalIds = ids.map(id => getGameApplication(id)?.getCanonicalGameId()).filter(id => id != null);
+    await fetchApplications(canonicalIds);
 }
 
 function useGames() {
@@ -130,8 +137,8 @@ function useGames() {
 function Stat({ label, value }: { label: string; value: string; }) {
     return (
         <div className={cl("stat")}>
-            <BaseText size="sm" weight="medium" className={cl("subtle")}>{label}</BaseText>
-            <BaseText size="lg" weight="semibold" className={cl("strong")}>{value}</BaseText>
+            <Text size="sm" weight="medium" className={cl("subtle")}>{label}</Text>
+            <Text size="lg" weight="semibold" className={cl("strong")}>{value}</Text>
         </div>
     );
 }
@@ -143,11 +150,11 @@ function GameRow({ game, longest }: { game: Game; longest: number; }) {
                 ? <img className={cl("icon")} src={game.icon} alt="" />
                 : <div className={cl("icon")}><GameControllerIcon size="sm" color="currentColor" /></div>}
             <div className={cl("info")}>
-                <BaseText size="md" weight="semibold" className={cl("name")}>{game.name}</BaseText>
-                <BaseText size="sm" className={cl("subtle")}>Last played {moment(game.lastPlayed).locale("en").fromNow()}</BaseText>
+                <Text size="md" weight="semibold" className={cl("name")}>{game.name}</Text>
+                <Text size="sm" className={cl("subtle")}>Last played {moment(game.lastPlayed).locale("en").fromNow()}</Text>
             </div>
             <div className={cl("time")}>
-                <BaseText size="sm" weight="semibold" className={cl("strong")}>{formatDuration(game.duration)}</BaseText>
+                <Text size="sm" weight="semibold" className={cl("strong")}>{formatDuration(game.duration)}</Text>
                 <div className={cl("bar")}>
                     <div className={cl("fill")} style={{ width: `${game.duration / longest * 100}%` }} />
                 </div>
@@ -172,7 +179,7 @@ function PlayTimeSection() {
     if (!loaded) return null;
 
     if (!games.length) {
-        return <BaseText size="sm" className={cl("subtle")}>No play time recorded yet.</BaseText>;
+        return <Text size="sm" className={cl("subtle")}>No play time recorded yet.</Text>;
     }
 
     const total = games.reduce((sum, game) => sum + game.duration, 0);
@@ -209,7 +216,7 @@ function PlayTimeSection() {
 
             <div className={cl("list")}>
                 {visible.map(game => <GameRow key={game.id} game={game} longest={longest} />)}
-                {!visible.length && <BaseText size="sm" className={cl("subtle", "empty")}>No games match your search.</BaseText>}
+                {!visible.length && <Text size="sm" className={cl("subtle", "empty")}>No games match your search.</Text>}
             </div>
 
             {!query && sorted.length > PREVIEW_COUNT && (
